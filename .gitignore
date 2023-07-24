@@ -1,1 +1,5 @@
+#compler related file
 /target
+
+#IDE/Editor related file
+.vscode

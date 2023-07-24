@@ -1,22 +1,23 @@
 #[cfg(test)]
 mod test;
 
-mod fraction;
-mod model;
+pub mod formula;
+pub mod fraction;
+pub mod error;
 
 use std::collections::HashMap;
 use std::rc::Rc;
 
+pub use error::{Error, Result};
+pub use formula::{Formula, FormulaItem, Item, FormulaList, Plan};
 pub use fraction::Fraction;
-pub use model::Metadata;
-pub use model::{Formula, FormulaItem, Item, Result};
 
 pub fn calculate<'a>(
-    meta: &'a Metadata,
+    meta: &'a FormulaList,
     source: &[Rc<Item>],
     target: Rc<Item>,
     amount: u32,
-) -> Vec<Result> {
+) -> Vec<Plan> {
     let formulas = meta.formulas();
     let mut data: HashMap<_, _> = formulas
         .iter()
@@ -63,7 +64,7 @@ pub fn calculate<'a>(
         .speed = amount.into();
     let mut calculated_item: Vec<Rc<Item>> = Vec::new();
     calculated_item.push(target);
-    let mut results: Vec<Result> = Vec::new();
+    let mut results: Vec<Plan> = Vec::new();
     while let Some(item) = calculated_item.pop() {
         let d = data.get(&item).unwrap();
         let speed: Fraction = d.speed.into();
@@ -71,7 +72,7 @@ pub fn calculate<'a>(
         let speed_t = speed_f * d.formula.target().amount().into();
         let group = speed / speed_t;
 
-        results.push(Result {
+        results.push(Plan {
             formula: d.formula.clone(),
             speed,
             group: group.cell(),

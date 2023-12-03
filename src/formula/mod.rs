@@ -218,7 +218,7 @@ impl Parsed for FormulaItem {
             if reader.peek()? == '*' {
                 _ = reader.read()?;
             } else {
-                todo!("unknown char")
+                err_unknown_char(reader, "FormulaItem-Mid".to_string())?;
             }
         }
 
